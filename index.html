@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>남정 타임 오토프라이 — 자동 치킨 튀김 로봇</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: oklch(22% 0.06 248);
+    --navy-mid: oklch(30% 0.07 248);
+    --navy-light: oklch(38% 0.07 248);
+    --gold: oklch(70% 0.12 78);
+    --gold-light: oklch(82% 0.10 82);
+    --silver: oklch(88% 0.01 248);
+    --cream: oklch(97% 0.01 90);
+    --white: oklch(99% 0.005 90);
+    --text-dark: oklch(18% 0.03 248);
+    --text-mid: oklch(42% 0.03 248);
+    --text-light: oklch(62% 0.02 248);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--white);
+    color: var(--text-dark);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--navy);
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo-mark {
+    width: 36px; height: 36px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+  .nav-logo-text {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--white);
+  }
+  .nav-logo-sub {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: oklch(80% 0.02 248);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold-light); }
+
+  .nav-cta {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 9px 22px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--gold-light); }
+
+  /* HERO */
+  .hero {
+    margin-top: 64px;
+    background: var(--navy);
+    min-height: 88vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 80px 8% 80px;
+    gap: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, oklch(28% 0.08 248) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-size: clamp(36px, 4.5vw, 58px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    text-wrap: pretty;
+  }
+  .hero-title em {
+    font-style: normal;
+    color: var(--gold);
+  }
+
+  .hero-desc {
+    font-size: clamp(16px, 1.5vw, 19px);
+    color: oklch(78% 0.03 248);
+    font-weight: 300;
+    line-height: 1.85;
+    margin-bottom: 44px;
+    max-width: 500px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 16px 36px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-secondary {
+    border: 1.5px solid oklch(55% 0.04 248);
+    color: oklch(80% 0.03 248);
+    padding: 16px 36px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+  .hero-image {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .hero-img-main {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.45);
+  }
+  .hero-img-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .hero-img-small {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--navy-mid);
+    padding: 36px 8%;
+    display: flex;
+    gap: 0;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    text-align: center;
+    padding: 16px 40px;
+  }
+  .stat-item + .stat-item {
+    border-left: 1px solid oklch(40% 0.04 248);
+  }
+  .stat-num {
+    font-size: clamp(32px, 3.5vw, 48px);
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .stat-unit {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--gold);
+  }
+  .stat-label {
+    font-size: 14px;
+    color: oklch(72% 0.03 248);
+    font-weight: 300;
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  /* SECTION COMMON */
+  section { padding: 96px 8%; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: clamp(28px, 3vw, 42px);
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    text-wrap: pretty;
+  }
+  .section-sub {
+    font-size: 17px;
+    color: var(--text-mid);
+    font-weight: 300;
+    max-width: 560px;
+    line-height: 1.9;
+  }
+
+  /* FEATURES */
+  .features-section { background: var(--cream); }
+
+  .features-header { margin-bottom: 64px; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .feature-card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 40px 36px;
+    border: 1px solid oklch(91% 0.01 248);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .feature-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+  }
+
+  .feature-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--navy);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .feature-icon svg { width: 26px; height: 26px; fill: var(--gold); }
+
+  .feature-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .feature-desc {
+    font-size: 15px;
+    color: var(--text-mid);
+    line-height: 1.85;
+    font-weight: 300;
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    background: var(--white);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .how-content {}
+  .steps {
+    margin-top: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .step {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--navy);
+    color: var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 15px;
+    margin-top: 2px;
+  }
+  .step-body {}
+  .step-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+  .step-desc {
+    font-size: 14px;
+    color: var(--text-mid);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  .how-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .how-img {
+    width: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .how-img-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* GALLERY */
+  .gallery-section { background: var(--navy); padding: 96px 8%; }
+  .gallery-section .section-title { color: var(--white); }
+  .gallery-section .section-sub { color: oklch(72% 0.03 248); }
+
+  .gallery-grid {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .gallery-item {
+    overflow: hidden;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+  }
+  .gallery-item img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+    filter: brightness(0.88);
+  }
+  .gallery-item:hover img {
+    transform: scale(1.04);
+    filter: brightness(1);
+  }
+  .gallery-item:first-child {
+    grid-row: span 2;
+  }
+  .gallery-item:first-child img {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
+  /* SPECS */
+  .specs-section { background: var(--cream); }
+  .specs-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 56px;
+  }
+
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .spec-table tr {
+    border-bottom: 1px solid oklch(88% 0.01 248);
+  }
+  .spec-table tr:first-child { border-top: 2px solid var(--navy); }
+  .spec-table td {
+    padding: 18px 16px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .spec-table td:first-child {
+    font-weight: 600;
+    color: var(--text-dark);
+    width: 42%;
+    background: oklch(95% 0.005 248);
+  }
+  .spec-table td:last-child {
+    color: var(--text-mid);
+    font-weight: 300;
+  }
+
+  .model-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .model-card {
+    background: var(--white);
+    border: 1px solid oklch(88% 0.01 248);
+    border-radius: 8px;
+    padding: 28px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: box-shadow 0.2s;
+  }
+  .model-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.09); }
+  .model-card.featured {
+    border-color: var(--navy);
+    background: var(--navy);
+  }
+  .model-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 900;
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .model-card.featured .model-badge {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .model-info {}
+  .model-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+  .model-card.featured .model-name { color: var(--white); }
+  .model-detail {
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+  .model-card.featured .model-detail { color: oklch(72% 0.03 248); }
+  .model-tag {
+    margin-left: auto;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  /* CTA */
+  .cta-section {
+    background: var(--navy);
+    padding: 100px 8%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, oklch(28% 0.08 248) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .cta-content { position: relative; z-index: 1; }
+  .cta-section .section-title {
+    color: var(--white);
+    max-width: 700px;
+    margin: 0 auto 16px;
+  }
+  .cta-section .section-sub {
+    color: oklch(72% 0.03 248);
+    max-width: 520px;
+    margin: 0 auto 52px;
+    text-align: center;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .contact-card {
+    background: oklch(28% 0.06 248);
+    border-radius: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    border: 1px solid oklch(35% 0.06 248);
+    transition: background 0.2s;
+  }
+  .contact-card:hover { background: oklch(32% 0.06 248); }
+  .contact-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .contact-type {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .contact-value {
+    font-size: 15px;
+    color: var(--white);
+    font-weight: 500;
+    text-decoration: none;
+    display: block;
+  }
+  .contact-value:hover { color: var(--gold-light); }
+
+  /* FOOTER */
+  footer {
+    background: oklch(14% 0.04 248);
+    color: oklch(55% 0.03 248);
+    padding: 40px 8%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-logo {
+    font-size: 15px;
+    font-weight: 700;
+    color: oklch(75% 0.03 248);
+  }
+  .footer-copy {
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  /* LIGHTBOX */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 6px;
+    object-fit: contain;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    font-size: 36px;
+    color: white;
+    cursor: pointer;
+    line-height: 1;
+    background: none;
+    border: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  /* VIDEO SECTION */
+  .video-section { background: var(--white); }
+
+  .video-layout {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .video-player-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  }
+  .video-player-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-main-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+  }
+  .video-main-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    background: var(--navy);
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .video-main-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    letter-spacing: -0.01em;
+  }
+
+  .video-thumbs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .video-thumb {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1.5px solid oklch(90% 0.01 248);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--white);
+  }
+  .video-thumb:hover { border-color: var(--navy); background: var(--cream); }
+  .video-thumb.active { border-color: var(--navy); background: var(--navy); }
+
+  .thumb-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+    width: 20px;
+  }
+  .video-thumb.active .thumb-num { color: var(--gold); }
+
+  .thumb-preview {
+    width: 80px;
+    height: 52px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: oklch(85% 0.01 248);
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .thumb-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    background: rgba(0,0,0,0.3);
+  }
+
+  .thumb-info { flex: 1; min-width: 0; }
+  .thumb-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .video-thumb.active .thumb-title { color: var(--white); }
+  .thumb-desc { font-size: 12px; color: var(--text-light); font-weight: 300; }
+  .video-thumb.active .thumb-desc { color: oklch(70% 0.03 248); }
+
+  @media (max-width: 900px) {
+    .video-layout { grid-template-columns: 1fr; }
+    .video-thumbs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .video-thumb { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .thumb-preview { width: 100%; height: 90px; }
+    .thumb-num { width: auto; }
+  }
+  @media (max-width: 540px) {
+    .video-thumbs { grid-template-columns: 1fr; }
+  }
+
+  /* FORM OVERLAY */
+  .form-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .form-overlay.open { display: flex; }
+
+  .form-modal {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 48px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-close {
+    position: absolute;
+    top: 20px; right: 24px;
+    font-size: 28px;
+    line-height: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: color 0.2s;
+  }
+  .form-close:hover { color: var(--text-dark); }
+
+  .form-header { margin-bottom: 32px; }
+  .form-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .form-sub { font-size: 14px; color: var(--text-light); font-weight: 300; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-group { margin-bottom: 20px; }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+  .required { color: var(--gold); }
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid oklch(88% 0.01 248);
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--text-dark);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px oklch(22% 0.06 248 / 0.1);
+  }
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.7;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .radio-item {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .radio-item input[type="radio"] { display: none; }
+  .radio-label {
+    padding: 9px 18px;
+    border: 1.5px solid oklch(88% 0.01 248);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text-mid);
+    font-weight: 400;
+    transition: all 0.15s;
+    cursor: pointer;
+    user-select: none;
+  }
+  .radio-item input[type="radio"]:checked + .radio-label {
+    border-color: var(--navy);
+    background: var(--navy);
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .form-submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--navy);
+    color: var(--gold);
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+  }
+  .form-submit:hover { background: var(--navy-mid); transform: translateY(-1px); }
+  .form-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 24px 0;
+  }
+  .form-success.show { display: block; }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: oklch(55% 0.15 145);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+    margin: 0 auto 20px;
+  }
+  .success-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+  }
+  .success-desc {
+    font-size: 15px;
+    color: var(--text-mid);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 600px) {
+    .form-modal { padding: 32px 24px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 40px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .how-section { grid-template-columns: 1fr; gap: 48px; }
+    .specs-layout { grid-template-columns: 1fr; gap: 48px; }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .gallery-item:first-child { grid-row: span 1; }
+    .gallery-item:first-child img { aspect-ratio: 3/4; height: auto; }
+    .contact-grid { grid-template-columns: 1fr; max-width: 340px; }
+    .nav-links { display: none; }
+    .stat-item + .stat-item { border-left: none; border-top: 1px solid oklch(40% 0.04 248); }
+    .stats-bar { flex-direction: column; gap: 0; }
+  }
+
+  /* LIFT CYCLE VIZ */
+  .lift-cycle-viz {
+    margin: 48px 0 64px;
+    --lcv-ease: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  .lcv-header { margin-bottom: 24px; }
+  .lcv-intro {
+    font-size: 15px;
+    color: var(--text-mid);
+    font-weight: 300;
+    line-height: 1.8;
+    margin-top: 4px;
+  }
+  .lcv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .lcv-panel {
+    background: var(--white);
+    border: 1px solid oklch(91% 0.01 248);
+    border-radius: 10px;
+    padding: 24px 24px 20px;
+    position: relative;
+  }
+  .lcv-chip {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 5px 12px;
+    border-radius: 3px;
+    margin-bottom: 14px;
+  }
+  .lcv-stage {
+    width: 100%;
+    height: auto;
+    max-height: 280px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* SVG internals */
+  .lcv-rail { stroke: oklch(86% 0.01 248); stroke-width: 1; stroke-dasharray: 2 3; }
+  .lcv-tank { fill: oklch(96% 0.005 248); stroke: var(--navy); stroke-width: 1.5; }
+  .lcv-oil { fill: var(--gold-light); opacity: 0.78; }
+  .lcv-oil-surface { stroke: var(--gold); stroke-width: 1.2; opacity: 0.55; }
+  .lcv-basket-body { fill: oklch(94% 0.005 248); stroke: var(--text-mid); stroke-width: 1.2; }
+  .lcv-basket-mesh { stroke: var(--text-mid); stroke-width: 0.55; opacity: 0.55; }
+  .lcv-basket-handle {
+    stroke: var(--text-mid);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    transform-origin: 100px 8px;
+    will-change: transform;
+  }
+  .lcv-basket-grip { fill: var(--navy); }
+  .lcv-steam circle { fill: oklch(90% 0.01 248); opacity: 0; }
+
+  /* Basket motion */
+  .lcv-basket { will-change: transform; }
+  .lcv-panel--one .lcv-basket { animation: lcvLiftOne 8s var(--lcv-ease) infinite; }
+  .lcv-panel--two .lcv-basket { animation: lcvLiftTwo 12s var(--lcv-ease) infinite; }
+  @keyframes lcvLiftOne {
+    0%, 100% { transform: translateY(0); }
+    10%      { transform: translateY(130px); }
+    80%      { transform: translateY(130px); }
+    90%      { transform: translateY(0); }
+  }
+  @keyframes lcvLiftTwo {
+    0%, 100% { transform: translateY(0); }
+    7%       { transform: translateY(130px); }
+    35%      { transform: translateY(130px); }
+    42%      { transform: translateY(0); }
+    55%      { transform: translateY(0); }
+    62%      { transform: translateY(130px); }
+    88%      { transform: translateY(130px); }
+    95%      { transform: translateY(0); }
+  }
+
+  /* Handle stretches in sync with basket body */
+  .lcv-panel--one .lcv-basket-handle { animation: lcvHandleOne 8s var(--lcv-ease) infinite; }
+  .lcv-panel--two .lcv-basket-handle { animation: lcvHandleTwo 12s var(--lcv-ease) infinite; }
+  @keyframes lcvHandleOne {
+    0%, 100% { transform: scaleY(1); }
+    10%      { transform: scaleY(10.29); }
+    80%      { transform: scaleY(10.29); }
+    90%      { transform: scaleY(1); }
+  }
+  @keyframes lcvHandleTwo {
+    0%, 100% { transform: scaleY(1); }
+    7%       { transform: scaleY(10.29); }
+    35%      { transform: scaleY(10.29); }
+    42%      { transform: scaleY(1); }
+    55%      { transform: scaleY(1); }
+    62%      { transform: scaleY(10.29); }
+    88%      { transform: scaleY(10.29); }
+    95%      { transform: scaleY(1); }
+  }
+
+  /* Steam */
+  .lcv-panel--one .lcv-steam circle { animation: lcvSteamOne 8s ease-in-out infinite; }
+  .lcv-panel--two .lcv-steam circle { animation: lcvSteamTwo 12s ease-in-out infinite; }
+  .lcv-panel .lcv-steam circle:nth-child(2) { animation-delay: -0.4s; }
+  .lcv-panel .lcv-steam circle:nth-child(3) { animation-delay: -0.8s; }
+  @keyframes lcvSteamOne {
+    0%, 12%, 88%, 100% { opacity: 0; transform: translateY(0); }
+    25%, 70%           { opacity: 0.7; transform: translateY(-10px); }
+    82%                { opacity: 0; transform: translateY(-14px); }
+  }
+  @keyframes lcvSteamTwo {
+    0%, 9%, 42%, 55%, 92%, 100% { opacity: 0; transform: translateY(0); }
+    18%, 32%                    { opacity: 0.7; transform: translateY(-10px); }
+    68%, 85%                    { opacity: 0.7; transform: translateY(-10px); }
+  }
+
+  /* Timeline */
+  .lcv-timeline {
+    position: relative;
+    height: 34px;
+    margin-top: 16px;
+    padding: 0 6px;
+  }
+  .lcv-track {
+    position: absolute;
+    left: 6px; right: 6px; top: 9px;
+    height: 2px;
+    background: oklch(90% 0.01 248);
+    border-radius: 2px;
+  }
+  .lcv-marker {
+    position: absolute;
+    top: 18px;
+    left: var(--at);
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .lcv-marker::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: oklch(78% 0.02 248);
+    transform: translateX(-50%);
+  }
+  .lcv-dot {
+    position: absolute;
+    top: 3px;
+    left: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 3px oklch(70% 0.12 78 / 0.18);
+    will-change: left;
+  }
+  .lcv-panel--one .lcv-dot { animation: lcvDotOne 8s linear infinite; }
+  .lcv-panel--two .lcv-dot { animation: lcvDotTwo 12s linear infinite; }
+  @keyframes lcvDotOne { 0% { left: 0; } 100% { left: calc(100% - 14px); } }
+  @keyframes lcvDotTwo { 0% { left: 0; } 100% { left: calc(100% - 14px); } }
+
+  .lcv-caption {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  /* Tablet (M): keep 2-column, compress */
+  @media (max-width: 900px) {
+    .lcv-grid { gap: 16px; }
+    .lcv-panel { padding: 20px 16px 16px; }
+    .lcv-stage { max-height: 240px; }
+    .lcv-chip { font-size: 11px; padding: 4px 10px; }
+  }
+  /* Mobile (S): stack, hide marker labels */
+  @media (max-width: 540px) {
+    .lcv-grid { grid-template-columns: 1fr; gap: 16px; }
+    .lcv-stage { max-height: 260px; }
+    .lcv-marker { font-size: 0; top: 14px; }
+    .lcv-marker::before { top: -8px; }
+    .lcv-timeline { height: 22px; }
+  }
+
+  /* Reduced motion fallback */
+  @media (prefers-reduced-motion: reduce) {
+    .lcv-basket,
+    .lcv-basket-handle,
+    .lcv-steam circle,
+    .lcv-dot { animation: none !important; }
+    .lcv-basket { transform: translateY(75px); }
+    .lcv-basket-handle { transform: scaleY(6.36); }
+    .lcv-dot { left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">NJ</div>
+    <div>
+      <div class="nav-logo-text">남정 타임 오토프라이</div>
+      <div class="nav-logo-sub">NAMJUNG TIME AUTO FRY</div>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">특장점</a></li>
+    <li><a href="#how">작동원리</a></li>
+    <li><a href="#gallery">제품 사진</a></li>
+    <li><a href="#specs">사양</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">상담 문의</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-badge">자동화 튀김 솔루션</span>
+    <h1 class="hero-title">
+      사람 없이도<br>
+      <em>정확하게,</em><br>
+      매번 같은 맛
+    </h1>
+    <p class="hero-desc">
+      남정 타임 오토프라이는 설정된 시간에 맞춰 자동으로 바스켓을 올리고 내리는 치킨 튀김 자동화 로봇입니다. 숙련된 직원 없이도 균일한 품질을 유지하세요.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">무료 상담 신청</a>
+      <a href="#features" class="btn-secondary">제품 상세보기</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img src="uploads/2.jpg" alt="남정 오토프라이 듀얼 모델" class="hero-img-main">
+    <div class="hero-img-row">
+      <img src="uploads/4.jpg" alt="컨트롤러" class="hero-img-small">
+      <img src="uploads/3.jpg" alt="측면 뷰" class="hero-img-small">
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num">8<span class="stat-unit">개</span></div>
+    <div class="stat-label">시간 프리셋 저장</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">24<span class="stat-unit">시간</span></div>
+    <div class="stat-label">무인 연속 운전 가능</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">1<span class="stat-unit">초 이내</span></div>
+    <div class="stat-label">정밀 타이머 제어</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">4<span class="stat-unit">종</span></div>
+    <div class="stat-label">원타임 · 투타임 라인업</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="features-header">
+    <div class="section-label">핵심 특장점</div>
+    <h2 class="section-title">왜 오토프라이인가?</h2>
+    <p class="section-sub">기존 수동 튀김의 한계를 기술로 해결합니다. 인건비 절감부터 품질 균일화까지 매장 운영의 새로운 기준을 제시합니다.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      </div>
+      <div class="feature-title">완전자동 리프트</div>
+      <div class="feature-desc">설정 시간이 되면 모터가 자동으로 바스켓을 기름에서 꺼냅니다. 더 이상 눈앞에서 지켜보지 않아도 됩니다.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+      </div>
+      <div class="feature-title">8개 시간 프리셋</div>
+      <div class="feature-desc">메뉴별 최적 튀김 시간을 1~8번 버튼에 저장하세요. 버튼 하나로 재현 가능한 맛, 직원이 바뀌어도 동일한 품질.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      </div>
+      <div class="feature-title">인건비 절감</div>
+      <div class="feature-desc">튀김 전담 인력이 필요 없어집니다. 한 명의 직원이 여러 업무를 동시에 처리할 수 있어 인건비를 최적화합니다.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+      </div>
+      <div class="feature-title">위생·안전성 향상</div>
+      <div class="feature-desc">뜨거운 기름에 직접 손을 대지 않아도 됩니다. 화상 사고를 예방하고 주방 안전 수준을 높입니다.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+      </div>
+      <div class="feature-title">균일한 품질</div>
+      <div class="feature-desc">사람의 감각이 아닌 정밀 타이머가 튀김 시간을 제어합니다. 피크 타임에도 항상 같은 맛을 고객에게 제공합니다.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+      </div>
+      <div class="feature-title">간편한 조작</div>
+      <div class="feature-desc">대형 버튼과 LCD 디스플레이로 누구나 쉽게 사용할 수 있습니다. 별도 교육 없이 바로 사용 가능합니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-content">
+    <div class="section-label">작동 원리</div>
+    <h2 class="section-title">버튼 하나로<br>완성되는 튀김</h2>
+    <p class="section-sub" style="margin-top:12px;">도입·운영 관련 상담 문의 <a href="tel:031-566-8882" style="color:var(--navy); font-weight:700; text-decoration:none; border-bottom:1px solid var(--gold);">031-566-8882</a></p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">재료 투입</div>
+          <div class="step-desc">바스켓에 생닭을 넣고 기름 속으로 내립니다. 상단 소형 바스켓도 동시 활용 가능합니다.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">프리셋 선택</div>
+          <div class="step-desc">1~8번 버튼을 누르면 해당 프리셋의 시간으로 바로 시작합니다. LCD에 남은 시간이 실시간 표시됩니다.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">자동 완료</div>
+          <div class="step-desc">타이머가 끝나면 모터가 자동으로 바스켓을 올려 기름을 빼냅니다. 기름이 빠진 뒤 진동 알림으로 완료를 알려드립니다.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">취출 & 다음 준비</div>
+          <div class="step-desc">완성된 치킨을 꺼내고 다음 배치를 준비합니다. 직원은 그 사이 다른 업무를 처리할 수 있습니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="how-visual">
+    <img src="uploads/4.jpg" alt="컨트롤러 클로즈업" class="how-img" style="aspect-ratio:4/3; object-fit:cover;">
+    <div class="how-img-row">
+      <img src="uploads/5.jpg" alt="싱글 바스켓" class="how-img" style="aspect-ratio:4/3; object-fit:cover;">
+      <img src="uploads/1.jpg" alt="싱글 모델" class="how-img" style="aspect-ratio:4/3; object-fit:cover;">
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section class="video-section" id="videos">
+  <div class="section-label">제품 영상</div>
+  <h2 class="section-title">직접 확인하세요</h2>
+  <p class="section-sub">실제 매장에서 작동하는 남정 오토프라이의 모습을 영상으로 확인하세요.</p>
+
+  <div class="video-layout">
+    <div class="video-main">
+      <div class="video-player-wrap">
+        <iframe id="mainPlayer"
+          src="https://www.youtube.com/embed/MN3K8QJLfts?rel=0&modestbranding=1"
+          title="남정 오토프라이 영상"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="video-main-info">
+        <div class="video-main-num" id="mainNum">01</div>
+        <div class="video-main-title" id="mainTitle">튀김기의 혁명</div>
+      </div>
+    </div>
+
+    <div class="video-thumbs">
+      <div class="video-thumb active" data-id="MN3K8QJLfts" data-num="01" data-title="튀김기의 혁명" onclick="switchVideo(this)">
+        <div class="thumb-num">01</div>
+        <div class="thumb-preview">
+          <img src="https://img.youtube.com/vi/MN3K8QJLfts/mqdefault.jpg" alt="튀김기의 혁명" onerror="this.style.display='none'">
+          <div class="thumb-play">▶</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-title">튀김기의 혁명</div>
+          <div class="thumb-desc">타임 오토 프라이 소개</div>
+        </div>
+      </div>
+      <div class="video-thumb" data-id="M4Bolq2H_HU" data-num="02" data-title="2가지 튀김을 한 번에" onclick="switchVideo(this)">
+        <div class="thumb-num">02</div>
+        <div class="thumb-preview">
+          <img src="https://img.youtube.com/vi/M4Bolq2H_HU/mqdefault.jpg" alt="2가지 튀김을 한 번에" onerror="this.style.display='none'">
+          <div class="thumb-play">▶</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-title">2가지 튀김을 한 번에</div>
+          <div class="thumb-desc">동시 운영 시연</div>
+        </div>
+      </div>
+      <div class="video-thumb" data-id="z-_lJ4HlPnI" data-num="03" data-title="일반 튀김 요리법" onclick="switchVideo(this)">
+        <div class="thumb-num">03</div>
+        <div class="thumb-preview">
+          <img src="https://img.youtube.com/vi/z-_lJ4HlPnI/mqdefault.jpg" alt="일반 튀김 요리법" onerror="this.style.display='none'">
+          <div class="thumb-play">▶</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-title">일반 튀김 요리법</div>
+          <div class="thumb-desc">기본 조리 가이드</div>
+        </div>
+      </div>
+      <div class="video-thumb" data-id="8zh_rtcNXhE" data-num="04" data-title="가루 치킨 요리" onclick="switchVideo(this)">
+        <div class="thumb-num">04</div>
+        <div class="thumb-preview">
+          <img src="https://img.youtube.com/vi/8zh_rtcNXhE/mqdefault.jpg" alt="가루 치킨 요리" onerror="this.style.display='none'">
+          <div class="thumb-play">▶</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-title">가루 치킨 요리</div>
+          <div class="thumb-desc">치킨 메뉴 응용</div>
+        </div>
+      </div>
+      <div class="video-thumb" data-id="JjxPG7tTMn4" data-num="05" data-title="점성 있는 튀김 요리법" onclick="switchVideo(this)">
+        <div class="thumb-num">05</div>
+        <div class="thumb-preview">
+          <img src="https://img.youtube.com/vi/JjxPG7tTMn4/mqdefault.jpg" alt="점성 있는 튀김 요리법" onerror="this.style.display='none'">
+          <div class="thumb-play">▶</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-title">점성 있는 튀김 요리법</div>
+          <div class="thumb-desc">양념·반죽류 대응</div>
+        </div>
+      </div>
+      <div class="video-thumb" data-id="UfePDuK6-F8" data-num="06" data-title="제품 설치와 구성" onclick="switchVideo(this)">
+        <div class="thumb-num">06</div>
+        <div class="thumb-preview">
+          <img src="https://img.youtube.com/vi/UfePDuK6-F8/mqdefault.jpg" alt="제품 설치와 구성" onerror="this.style.display='none'">
+          <div class="thumb-play">▶</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-title">제품 설치와 구성</div>
+          <div class="thumb-desc">현장 설치 과정</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery-section" id="gallery">
+  <div class="section-label">제품 사진</div>
+  <h2 class="section-title">현장에서 검증된 성능</h2>
+  <p class="section-sub">실제 치킨 프랜차이즈 매장에 설치되어 운영 중인 남정 오토프라이입니다.</p>
+  <div class="gallery-grid">
+    <div class="gallery-item" onclick="openLightbox('uploads/2.jpg')">
+      <img src="uploads/2.jpg" alt="듀얼 모델 정면">
+    </div>
+    <div class="gallery-item" onclick="openLightbox('uploads/6.jpg')">
+      <img src="uploads/6.jpg" alt="상단 뷰">
+    </div>
+    <div class="gallery-item" onclick="openLightbox('uploads/7.jpg')">
+      <img src="uploads/7.jpg" alt="듀얼 정면">
+    </div>
+    <div class="gallery-item" onclick="openLightbox('uploads/8.jpg')">
+      <img src="uploads/8.jpg" alt="듀얼 모델 2">
+    </div>
+    <div class="gallery-item" onclick="openLightbox('uploads/9.jpg')">
+      <img src="uploads/9.jpg" alt="듀얼 전체">
+    </div>
+  </div>
+</section>
+
+<!-- SPECS -->
+<section class="specs-section" id="specs">
+  <div class="section-label">제품 사양</div>
+  <h2 class="section-title">모델 & 제원</h2>
+  <p class="section-sub">매장 규모와 메뉴 구성에 맞는 모델을 선택하세요.</p>
+
+  <div class="lift-cycle-viz" aria-label="원타임과 투타임 운전 모드 비교 다이어그램">
+    <div class="lcv-header">
+      <div class="section-label">한눈에 보는 운전 모드</div>
+      <p class="lcv-intro">원타임은 1회, 투타임은 2회 자동 리프트 사이클로 동작합니다.</p>
+    </div>
+    <div class="lcv-grid">
+      <div class="lcv-panel lcv-panel--one">
+        <div class="lcv-chip">원타임</div>
+        <svg class="lcv-stage" viewBox="0 0 200 240" role="img" aria-label="원타임: 바스켓이 1회 자동 하강·상승하는 사이클">
+          <line class="lcv-rail" x1="40" y1="10" x2="40" y2="220"/>
+          <line class="lcv-rail" x1="160" y1="10" x2="160" y2="220"/>
+          <rect class="lcv-tank" x="30" y="100" width="140" height="120" rx="8"/>
+          <rect class="lcv-oil" x="32" y="112" width="136" height="106" rx="6"/>
+          <line class="lcv-oil-surface" x1="34" y1="114" x2="166" y2="114"/>
+          <g class="lcv-steam">
+            <circle cx="72" cy="108" r="3"/>
+            <circle cx="100" cy="104" r="4"/>
+            <circle cx="128" cy="108" r="3"/>
+          </g>
+          <rect class="lcv-basket-grip" x="86" y="2" width="28" height="6" rx="2"/>
+          <line class="lcv-basket-handle" x1="100" y1="8" x2="100" y2="22" vector-effect="non-scaling-stroke"/>
+          <g class="lcv-basket">
+            <rect class="lcv-basket-body" x="62" y="22" width="76" height="50" rx="4"/>
+            <line class="lcv-basket-mesh" x1="62" y1="34" x2="138" y2="34"/>
+            <line class="lcv-basket-mesh" x1="62" y1="46" x2="138" y2="46"/>
+            <line class="lcv-basket-mesh" x1="62" y1="58" x2="138" y2="58"/>
+            <line class="lcv-basket-mesh" x1="80" y1="22" x2="80" y2="72"/>
+            <line class="lcv-basket-mesh" x1="100" y1="22" x2="100" y2="72"/>
+            <line class="lcv-basket-mesh" x1="120" y1="22" x2="120" y2="72"/>
+          </g>
+        </svg>
+        <div class="lcv-timeline" aria-hidden="true">
+          <div class="lcv-track"></div>
+          <span class="lcv-marker" style="--at:10%">하강</span>
+          <span class="lcv-marker" style="--at:45%">조리</span>
+          <span class="lcv-marker" style="--at:85%">상승</span>
+          <div class="lcv-dot"></div>
+        </div>
+        <div class="lcv-caption">1회 자동 리프트 사이클 · 하강 → 조리 → 상승</div>
+      </div>
+
+      <div class="lcv-panel lcv-panel--two">
+        <div class="lcv-chip">투타임</div>
+        <svg class="lcv-stage" viewBox="0 0 200 240" role="img" aria-label="투타임: 바스켓이 1차 조리 후 휴지를 거쳐 2차 조리로 이어지는 2회 사이클">
+          <line class="lcv-rail" x1="40" y1="10" x2="40" y2="220"/>
+          <line class="lcv-rail" x1="160" y1="10" x2="160" y2="220"/>
+          <rect class="lcv-tank" x="30" y="100" width="140" height="120" rx="8"/>
+          <rect class="lcv-oil" x="32" y="112" width="136" height="106" rx="6"/>
+          <line class="lcv-oil-surface" x1="34" y1="114" x2="166" y2="114"/>
+          <g class="lcv-steam">
+            <circle cx="72" cy="108" r="3"/>
+            <circle cx="100" cy="104" r="4"/>
+            <circle cx="128" cy="108" r="3"/>
+          </g>
+          <rect class="lcv-basket-grip" x="86" y="2" width="28" height="6" rx="2"/>
+          <line class="lcv-basket-handle" x1="100" y1="8" x2="100" y2="22" vector-effect="non-scaling-stroke"/>
+          <g class="lcv-basket">
+            <rect class="lcv-basket-body" x="62" y="22" width="76" height="50" rx="4"/>
+            <line class="lcv-basket-mesh" x1="62" y1="34" x2="138" y2="34"/>
+            <line class="lcv-basket-mesh" x1="62" y1="46" x2="138" y2="46"/>
+            <line class="lcv-basket-mesh" x1="62" y1="58" x2="138" y2="58"/>
+            <line class="lcv-basket-mesh" x1="80" y1="22" x2="80" y2="72"/>
+            <line class="lcv-basket-mesh" x1="100" y1="22" x2="100" y2="72"/>
+            <line class="lcv-basket-mesh" x1="120" y1="22" x2="120" y2="72"/>
+          </g>
+        </svg>
+        <div class="lcv-timeline" aria-hidden="true">
+          <div class="lcv-track"></div>
+          <span class="lcv-marker" style="--at:18%">1차</span>
+          <span class="lcv-marker" style="--at:48%">휴지</span>
+          <span class="lcv-marker" style="--at:78%">2차</span>
+          <div class="lcv-dot"></div>
+        </div>
+        <div class="lcv-caption">2회 자동 리프트 사이클 · 1차 조리 → 휴지 → 2차 조리</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="specs-layout">
+    <div>
+      <table class="spec-table">
+        <tr><td>브랜드</td><td>남정 (NAMJUNG)</td></tr>
+        <tr><td>모델명</td><td>Time Auto Fry</td></tr>
+        <tr><td>구성</td><td>원타임 1구 · 2구 (1회 리프트) / 투타임 1구 · 2구 (2회 리프트)</td></tr>
+        <tr><td>제어방식</td><td>디지털 타이머 자동 제어</td></tr>
+        <tr><td>프리셋</td><td>8개 메모리 저장 (set 1~8)</td></tr>
+        <tr><td>조작</td><td>10초 / 30초 / 1분 / 5분 단위 설정</td></tr>
+        <tr><td>알림</td><td>진동 알림 (vib ON/OFF)</td></tr>
+        <tr><td>바스켓(별도구매)</td><td>대형 + 소형 2단 구성 · 용도에 맞추어 제작 가능</td></tr>
+        <tr><td>본체 재질</td><td>스테인리스 스틸 (SUS304)</td></tr>
+        <tr><td>A/S</td><td>031-566-8882</td></tr>
+      </table>
+    </div>
+    <div class="model-cards">
+      <div class="section-label" style="margin-bottom:20px;">모델 선택 가이드</div>
+      <div class="model-card">
+        <div class="model-badge">1구</div>
+        <div class="model-info">
+          <div class="model-name">원타임 1구</div>
+          <div class="model-detail">바스켓 1구 · 1회 자동 리프트 사이클</div>
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-badge">2구</div>
+        <div class="model-info">
+          <div class="model-name">원타임 2구</div>
+          <div class="model-detail">바스켓 2구 · 1회 자동 리프트 사이클</div>
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-badge">1구</div>
+        <div class="model-info">
+          <div class="model-name">투타임 1구</div>
+          <div class="model-detail">바스켓 1구 · 2회 자동 리프트 사이클</div>
+        </div>
+      </div>
+      <div class="model-card">
+        <div class="model-badge">2구</div>
+        <div class="model-info">
+          <div class="model-name">투타임 2구</div>
+          <div class="model-detail">바스켓 2구 · 2회 자동 리프트 사이클</div>
+        </div>
+      </div>
+      <div style="background: oklch(96% 0.008 78); border-radius: 8px; padding: 24px 24px; border-left: 4px solid var(--gold);">
+        <div style="font-size:14px; font-weight:700; color:var(--text-dark); margin-bottom:8px;">💡 도입 전 확인사항</div>
+        <div style="font-size:13px; color:var(--text-mid); line-height:1.8; font-weight:300;">
+          기본 택배 방식으로 발송되며, 필요 시 전문 기사가 현장 방문하여 설치해 드립니다. 린라이 튀김기 전용이며, 타사 튀김기는 사전 미팅 후 설치 가능합니다.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="cta-content">
+    <div class="section-label" style="text-align:center;">지금 바로 시작하세요</div>
+    <h2 class="section-title">매장 자동화, 오늘부터 가능합니다</h2>
+    <p class="section-sub">도입 비용, 설치 일정, 기존 튀김기 호환 여부를 무료로 상담해 드립니다.</p>
+    <div class="contact-grid">
+      <div class="contact-card" onclick="openForm()" style="cursor:pointer;">
+        <span class="contact-icon">✉️</span>
+        <div class="contact-type">온라인 상담</div>
+        <span class="contact-value">문의 폼 작성하기</span>
+      </div>
+      <div class="contact-card">
+        <span class="contact-icon">📞</span>
+        <div class="contact-type">전화 상담</div>
+        <a href="tel:031-566-8882" class="contact-value">031-566-8882</a>
+      </div>
+      <div class="contact-card">
+        <span class="contact-icon">🏭</span>
+        <div class="contact-type">현장 시연</div>
+        <a href="tel:031-566-8882" class="contact-value">방문 예약하기</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">남정 타임 오토프라이 · NAMJUNG TIME AUTO FRY</div>
+  <div class="footer-copy">© 2026 NAMJUNG. All rights reserved. | A/S: 031-566-8882</div>
+</footer>
+
+<!-- INQUIRY FORM OVERLAY -->
+<div class="form-overlay" id="formOverlay" onclick="closeForm(event)">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <button class="form-close" onclick="closeFormModal()">×</button>
+    <div class="form-header">
+      <div class="section-label" style="margin-bottom:8px;">무료 상담 신청</div>
+      <h3 class="form-title">남정 오토프라이 도입 문의</h3>
+      <p class="form-sub">담당자가 1~2 영업일 내 연락드립니다.</p>
+    </div>
+    <form id="inquiryForm" action="YOUR_FORMSPREE_ENDPOINT" method="POST" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">성함 <span class="required">*</span></label>
+          <input type="text" name="name" class="form-input" placeholder="홍길동" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">연락처 <span class="required">*</span></label>
+          <input type="tel" name="phone" class="form-input" placeholder="010-0000-0000" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">매장명</label>
+        <input type="text" name="store" class="form-input" placeholder="○○ 치킨 ○○점">
+      </div>
+      <div class="form-group">
+        <label class="form-label">관심 모델 <span class="required">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="model" value="원타임 1구" required>
+            <span class="radio-label">원타임 1구</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="model" value="원타임 2구" required>
+            <span class="radio-label">원타임 2구</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="model" value="투타임 1구" required>
+            <span class="radio-label">투타임 1구</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="model" value="투타임 2구" required>
+            <span class="radio-label">투타임 2구</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="model" value="미정 / 상담 필요" required>
+            <span class="radio-label">미정 / 상담 필요</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">문의 내용</label>
+        <textarea name="message" class="form-input form-textarea" placeholder="현재 사용 중인 튀김기 모델, 매장 규모, 궁금한 점 등을 자유롭게 적어주세요."></textarea>
+      </div>
+      <input type="hidden" name="_subject" value="[남정 오토프라이] 상담 문의 접수">
+      <input type="hidden" name="_language" value="ko">
+      <button type="submit" class="form-submit">상담 신청하기</button>
+    </form>
+    <div class="form-success" id="formSuccess">
+      <div class="success-icon">✓</div>
+      <div class="success-title">신청이 완료되었습니다!</div>
+      <div class="success-desc">1~2 영업일 내에 담당자가 연락드리겠습니다.<br>급한 문의는 <strong>031-566-8882</strong>로 연락주세요.</div>
+      <button class="btn-primary" style="margin-top:24px;" onclick="closeFormModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  function switchVideo(el) {
+    document.querySelectorAll('.video-thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const id = el.dataset.id;
+    const num = el.dataset.num;
+    const title = el.dataset.title;
+    document.getElementById('mainPlayer').src =
+      'https://www.youtube.com/embed/' + id + '?rel=0&modestbranding=1&autoplay=1';
+    document.getElementById('mainNum').textContent = num;
+    document.getElementById('mainTitle').textContent = title;
+  }
+
+  // Form overlay
+  function openForm() {
+    document.getElementById('formOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeFormModal() {
+    document.getElementById('formOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeForm(e) {
+    if (e.target === document.getElementById('formOverlay')) closeFormModal();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeFormModal();
+  });
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('inquiryForm');
+    const btn = form.querySelector('.form-submit');
+    btn.disabled = true;
+    btn.textContent = '전송 중...';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        form.style.display = 'none';
+        document.getElementById('formSuccess').classList.add('show');
+      } else {
+        alert('전송에 실패했습니다. 잠시 후 다시 시도하거나 전화로 문의해 주세요. (031-566-8882)');
+        btn.disabled = false;
+        btn.textContent = '상담 신청하기';
+      }
+    } catch {
+      alert('네트워크 오류가 발생했습니다. 031-566-8882로 직접 연락주세요.');
+      btn.disabled = false;
+      btn.textContent = '상담 신청하기';
+    }
+  }
+
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-card, .step, .model-card, .contact-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+
+  // Lift-cycle viz: pause animations when offscreen to save battery/CPU
+  (function () {
+    const panels = document.querySelectorAll('.lcv-panel');
+    if (!panels.length || !('IntersectionObserver' in window)) return;
+    const targets = '.lcv-basket, .lcv-basket-handle, .lcv-steam circle, .lcv-dot';
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        const state = e.isIntersecting ? 'running' : 'paused';
+        e.target.querySelectorAll(targets).forEach(el => {
+          el.style.animationPlayState = state;
+        });
+      });
+    }, { threshold: 0.1 });
+    panels.forEach(p => io.observe(p));
+  })();
+</script>
+
+</body>
+</html>
